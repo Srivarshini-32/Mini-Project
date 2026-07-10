@@ -1,0 +1,66 @@
+#include <Servo.h>
+int trig = 5, echo =6;
+int led = 13;
+int touch = 2; 
+int ir = 8;
+int buzz= 11;
+int pos = 0;
+Servo servo_9;
+
+void setup()
+{
+  pinMode(trig,OUTPUT);
+  pinMode(echo,INPUT);
+  pinMode(led,OUTPUT);
+  pinMode(ir,INPUT);
+  pinMode(touch,INPUT);
+  pinMode(buzz,OUTPUT);
+  servo_9.attach(9, 500, 2500);
+  Serial.begin(9600);
+  }
+
+void loop()
+{
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  long duration = pulseIn(echo, HIGH, 30000);
+  if (duration == 0) {
+    Serial.println(F("Out of Range"));
+    
+  } 
+  else {
+    float cm = duration * 0.034 / 2;
+    Serial.print(F("Distance: "));
+    Serial.println(cm);
+    if(cm<10){
+     Serial.println(F("Vehicle is in the range"));
+    for (pos = 0; pos <= 90; pos += 1){ 
+    servo_9.write(pos);
+    delay(15); 
+    }
+    digitalWrite(led,HIGH);
+     tone(buzz,1000);
+     }
+    }
+    int val = digitalRead(ir);
+    if(val==HIGH)
+      {
+      for (pos = 90; pos >= 0; pos -= 1){ 
+      delay(15); 
+      noTone(buzz);
+      digitalWrite(led,LOW);
+      }
+      Serial.println("Vehichle successfully parked");
+      }
+   if (digitalRead(touch)==HIGH)
+    {
+      for (pos = 0; pos <= 90; pos += 1) 
+      servo_9.write(pos);
+      delay(15); 
+      digitalWrite(led,HIGH);
+      tone(buzz,1000);
+    } 
+}
